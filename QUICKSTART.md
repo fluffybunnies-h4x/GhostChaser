@@ -2,17 +2,21 @@
 
 ## 5-Minute Setup
 
-### 1. Build the Application
+### 1. Build the Portable Application
+Build a fully self-contained executable (no .NET installation required):
+
 ```bash
 cd GhostChaser
-dotnet build GhostChaser.sln --configuration Release
+dotnet publish GhostChaser\GhostChaser.csproj -c Release
 ```
 
 ### 2. Run GhostChaser
 ```bash
-cd GhostChaser\bin\Release\net8.0-windows
+cd GhostChaser\bin\Release\net8.0-windows\win-x64\publish
 GhostChaser.exe
 ```
+
+**Note:** The entire `publish` folder is portable - copy it anywhere (USB drive, network share, etc.) and run!
 
 ### 3. Deploy Your First Ghost
 

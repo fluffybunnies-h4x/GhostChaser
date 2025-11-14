@@ -21,32 +21,56 @@ GhostChaser enables security teams to implement proactive defense-in-depth strat
 
 ## Prerequisites
 
+### For Building:
 - **Operating System**: Windows 10/11 or Windows Server 2016+
-- **.NET Runtime**: .NET 8.0 or higher
+- **.NET 8.0 SDK**: Required for building ([Download](https://dotnet.microsoft.com/download/dotnet/8.0))
+
+### For Running (Self-Contained Build):
+- **Operating System**: Windows 10/11 or Windows Server 2016+ (64-bit)
 - **Permissions**: Administrator privileges on target systems
 - **Domain Environment** (optional): Active Directory for domain Ghost accounts
+- **NO .NET Runtime Required** - Everything is included!
 
-## Installation
+### For Running (Framework-Dependent Build):
+- **.NET 8.0 Desktop Runtime**: Required ([Download](https://dotnet.microsoft.com/download/dotnet/8.0))
+- **Permissions**: Administrator privileges on target systems
 
-GhostChaser can be built in two ways: **self-contained** (recommended, no .NET required) or **framework-dependent** (requires .NET 8.0).
+## Installation & Building
 
-### Option 1: Self-Contained Build (Recommended)
+GhostChaser can be built in two ways: **self-contained** (recommended, no .NET required on target) or **framework-dependent** (requires .NET 8.0 Runtime).
 
-Creates a single executable with everything included - no .NET installation required!
+### Option 1: Self-Contained Portable Build (Recommended) ⭐
 
-1. **Download** or clone the GhostChaser repository
+This creates a **fully portable, single-file executable** with the .NET runtime included. No installation required on target systems!
 
-2. **Publish** the self-contained application:
-   ```bash
-   dotnet publish GhostChaser\GhostChaser.csproj -c Release
-   ```
+**Build Command:**
+```bash
+dotnet publish GhostChaser\GhostChaser.csproj -c Release
+```
 
-3. **Run** the executable from:
-   ```bash
-   GhostChaser\bin\Release\net8.0-windows\win-x64\publish\GhostChaser.exe
-   ```
+**Alternative with MSBuild:**
+```bash
+msbuild GhostChaser\GhostChaser.csproj /p:Configuration=Release /t:Publish
+```
 
-   The entire `publish` folder is portable - copy it anywhere and run!
+**Output Location:**
+```
+GhostChaser\bin\Release\net8.0-windows\win-x64\publish\GhostChaser.exe
+```
+
+**Deployment:**
+- The `publish` folder contains everything needed
+- Copy the entire `publish` folder to any Windows 10+ machine
+- Run `GhostChaser.exe` directly - no dependencies needed!
+- Works on machines without .NET installed
+- Approximately 70-100MB (includes .NET runtime)
+
+**Key Features:**
+✅ Single executable with all dependencies
+✅ No .NET installation required on target
+✅ Fully portable - USB drive ready
+✅ Pre-compiled for faster startup
+✅ Perfect for deployment across multiple systems
 
 ### Option 2: Framework-Dependent Build
 
@@ -83,6 +107,58 @@ Requires .NET 8.0 Desktop Runtime to be installed on the target machine.
    ```
 
    > **Note:** GhostChaser is a C# .NET project and cannot be compiled with cl.exe (C/C++ compiler). Use dotnet CLI or MSBuild instead.
+
+## Portable Deployment Guide
+
+The self-contained build creates a fully portable installation:
+
+### Quick Deployment Steps:
+
+1. **Build once** on your development machine:
+   ```bash
+   dotnet publish GhostChaser\GhostChaser.csproj -c Release
+   ```
+
+2. **Locate the publish folder**:
+   ```
+   GhostChaser\bin\Release\net8.0-windows\win-x64\publish\
+   ```
+
+3. **Deploy anywhere**:
+   - Copy the entire `publish` folder to a USB drive
+   - Transfer to network share
+   - Distribute to multiple workstations
+   - Archive for later use
+
+4. **Run on any Windows 10+ machine**:
+   - No installation needed
+   - No .NET runtime required
+   - Just double-click `GhostChaser.exe`
+   - Must run as Administrator for Ghost deployment
+
+### What's Included in the Publish Folder:
+
+- `GhostChaser.exe` - Main executable (~70-100MB)
+- All .NET runtime components (embedded)
+- Required system libraries
+- No external dependencies
+
+### Deployment Scenarios:
+
+**Scenario 1: USB Drive Toolkit**
+- Copy `publish` folder to USB drive
+- Plug into any Windows machine
+- Run directly from USB
+
+**Scenario 2: Network Distribution**
+- Place `publish` folder on network share
+- Users run directly from network
+- Or copy locally for performance
+
+**Scenario 3: Multiple Workstation Deployment**
+- Build once, deploy everywhere
+- No per-machine configuration needed
+- Consistent version across all systems
 
 ## Usage Guide
 
