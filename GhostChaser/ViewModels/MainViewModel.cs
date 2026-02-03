@@ -44,7 +44,15 @@ namespace GhostChaser.ViewModels
         private string _shareDescription = string.Empty;
         private bool _enableShareAuditing = true;
 
+        // Ghost SPN specific
+        private string _spnServiceClass = "MSSQLSvc";
+        private string _spnServiceHost = string.Empty;
+        private string _spnServiceAccount = string.Empty;
+        private bool _spnCreateServiceAccount = true;
+        private bool _enableKerberosAuditing = true;
+
         public ObservableCollection<Ghost> DeployedGhosts { get; }
+        public ObservableCollection<string> SPNServiceClasses { get; }
         public ObservableCollection<string> FileExtensions { get; }
 
         public ICommand DeployGhostCommand { get; }
@@ -59,6 +67,7 @@ namespace GhostChaser.ViewModels
             {
                 ".txt", ".docx", ".xlsx", ".pdf", ".config", ".xml", ".json", ".sql", ".ps1", ".bat"
             };
+            SPNServiceClasses = new ObservableCollection<string>(GhostSPNService.CommonServiceClasses);
 
             DeployGhostCommand = new RelayCommand(async _ => await DeployGhostAsync(), _ => !IsDeploying);
             RemoveGhostCommand = new RelayCommand(async param => await RemoveGhostAsync(param as Ghost), param => param is Ghost && !IsDeploying);
@@ -80,6 +89,7 @@ namespace GhostChaser.ViewModels
                     OnPropertyChanged(nameof(IsAccountSelected));
                     OnPropertyChanged(nameof(IsFileSelected));
                     OnPropertyChanged(nameof(IsShareSelected));
+                    OnPropertyChanged(nameof(IsSPNSelected));
                 }
             }
         }
@@ -87,6 +97,7 @@ namespace GhostChaser.ViewModels
         public bool IsAccountSelected => SelectedGhostType == GhostType.Account;
         public bool IsFileSelected => SelectedGhostType == GhostType.File;
         public bool IsShareSelected => SelectedGhostType == GhostType.Share;
+        public bool IsSPNSelected => SelectedGhostType == GhostType.SPN;
 
         public string GhostName
         {
@@ -227,6 +238,37 @@ namespace GhostChaser.ViewModels
             set => SetProperty(ref _enableShareAuditing, value);
         }
 
+        // Ghost SPN Properties
+        public string SPNServiceClass
+        {
+            get => _spnServiceClass;
+            set => SetProperty(ref _spnServiceClass, value);
+        }
+
+        public string SPNServiceHost
+        {
+            get => _spnServiceHost;
+            set => SetProperty(ref _spnServiceHost, value);
+        }
+
+        public string SPNServiceAccount
+        {
+            get => _spnServiceAccount;
+            set => SetProperty(ref _spnServiceAccount, value);
+        }
+
+        public bool SPNCreateServiceAccount
+        {
+            get => _spnCreateServiceAccount;
+            set => SetProperty(ref _spnCreateServiceAccount, value);
+        }
+
+        public bool EnableKerberosAuditing
+        {
+            get => _enableKerberosAuditing;
+            set => SetProperty(ref _enableKerberosAuditing, value);
+        }
+
         #endregion
 
         private async Task DeployGhostAsync()
@@ -265,6 +307,7 @@ namespace GhostChaser.ViewModels
                     GhostType.Account => CreateGhostAccount(),
                     GhostType.File => CreateGhostFile(),
                     GhostType.Share => CreateGhostShare(),
+                    GhostType.SPN => CreateGhostSPN(),
                     _ => null
                 };
 
@@ -434,6 +477,42 @@ namespace GhostChaser.ViewModels
             };
         }
 
+        private GhostSPN? CreateGhostSPN()
+        {
+            if (string.IsNullOrWhiteSpace(SPNServiceClass))
+            {
+                SetError("Please select a service class (e.g., MSSQLSvc, HTTP).");
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(SPNServiceHost))
+            {
+                SetError("Please provide a service host (e.g., sqlserver.domain.com or sqlserver.domain.com:1433).");
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(SPNServiceAccount))
+            {
+                SetError("Please provide a service account name for the SPN.");
+                return null;
+            }
+
+            string spn = $"{SPNServiceClass}/{SPNServiceHost}";
+
+            return new GhostSPN
+            {
+                Name = GhostName,
+                ServiceClass = SPNServiceClass,
+                ServiceHost = SPNServiceHost,
+                ServicePrincipalName = spn,
+                ServiceAccount = SPNServiceAccount,
+                Domain = AccountDomain,
+                CreateServiceAccount = SPNCreateServiceAccount,
+                HasKerberosAuditingEnabled = EnableKerberosAuditing,
+                Description = $"Ghost honey SPN for Kerberoasting detection - {GhostName}"
+            };
+        }
+
         private IGhostDeploymentService? GetDeploymentService(GhostType type)
         {
             return type switch
@@ -441,6 +520,7 @@ namespace GhostChaser.ViewModels
                 GhostType.Account => new GhostAccountService(),
                 GhostType.File => new GhostFileService(),
                 GhostType.Share => new GhostShareService(),
+                GhostType.SPN => new GhostSPNService(),
                 _ => null
             };
         }
@@ -465,6 +545,8 @@ namespace GhostChaser.ViewModels
             ShareName = string.Empty;
             SharePath = string.Empty;
             ShareDescription = string.Empty;
+            SPNServiceHost = string.Empty;
+            SPNServiceAccount = string.Empty;
         }
     }
 }

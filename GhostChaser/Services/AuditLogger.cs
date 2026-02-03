@@ -159,6 +159,16 @@ namespace GhostChaser.Services
                     SharePath = share.SharePath,
                     HasAuditingEnabled = share.HasAuditingEnabled
                 },
+                GhostSPN spn => new
+                {
+                    ServicePrincipalName = spn.ServicePrincipalName,
+                    ServiceClass = spn.ServiceClass,
+                    ServiceHost = spn.ServiceHost,
+                    ServiceAccount = spn.ServiceAccount,
+                    Domain = spn.Domain,
+                    HasKerberosAuditingEnabled = spn.HasKerberosAuditingEnabled,
+                    DetectionMethod = "Monitor Event ID 4769 (TGS Requests)"
+                },
                 _ => new { }
             };
         }

@@ -7,6 +7,7 @@ namespace GhostChaser.Models
     {
         Account,
         File,
-        Share
+        Share,
+        SPN
     }
 }

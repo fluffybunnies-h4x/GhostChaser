@@ -71,4 +71,60 @@ namespace GhostChaser.Models
             Type = GhostType.Share;
         }
     }
+
+    /// <summary>
+    /// Represents a Ghost SPN (Service Principal Name) for detecting Kerberoasting attacks.
+    /// When attackers enumerate SPNs using tools like Rubeus, Kerbrute, or Impacket,
+    /// the honey SPN triggers detection through Event ID 4769 (TGS requests).
+    /// </summary>
+    public class GhostSPN : Ghost
+    {
+        /// <summary>
+        /// The service class (e.g., MSSQLSvc, HTTP, FTP, LDAP, CIFS)
+        /// </summary>
+        public string ServiceClass { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The service host/instance (e.g., sqlserver.domain.com, webapp.domain.com:1433)
+        /// </summary>
+        public string ServiceHost { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The full SPN string (e.g., MSSQLSvc/sqlserver.domain.com:1433)
+        /// </summary>
+        public string ServicePrincipalName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The service account the SPN is registered to
+        /// </summary>
+        public string ServiceAccount { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Domain where the SPN is registered
+        /// </summary>
+        public string Domain { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Whether to create a new service account for the SPN or use existing
+        /// </summary>
+        public bool CreateServiceAccount { get; set; }
+
+        /// <summary>
+        /// Whether Kerberos auditing is enabled for this SPN (Event ID 4769)
+        /// </summary>
+        public bool HasKerberosAuditingEnabled { get; set; }
+
+        public GhostSPN()
+        {
+            Type = GhostType.SPN;
+        }
+
+        /// <summary>
+        /// Builds the full SPN string from service class and host
+        /// </summary>
+        public string BuildSPN()
+        {
+            return $"{ServiceClass}/{ServiceHost}";
+        }
+    }
 }
