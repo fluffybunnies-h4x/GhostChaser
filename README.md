@@ -1,3 +1,6 @@
+![GhostChaser](https://github.com/user-attachments/assets/374450b0-ad28-4513-9303-85cef5d1c5f4)
+
+
 # 👻 GhostChaser - Cyber Deception Toolkit
 
 **GhostChaser** is a Windows-based cyber deception tool designed to deploy and manage canary accounts, files, network shares, and Service Principal Names (collectively called "Ghosts") across enterprise Windows environments. These Ghosts act as tripwires to detect unauthorized access, lateral movement, Kerberoasting attacks, and malicious activity within your network.
